@@ -1,4 +1,3 @@
-
 import type { DataClass } from "../Interface/Project";
 import { Button, Card, Container, Form, Modal, Stack } from "react-bootstrap";
 import { Row, Col } from "react-bootstrap";
@@ -266,18 +265,7 @@ function StateEditor() {
     };
     return (
         <div>
-            <div>
-                <h2
-                    style={{
-                        fontFamily: "monospace",
-                        fontSize: "18px",
-                        padding: "16px",
-                    }}
-                >
-                    {project.name} — State Editor
-                </h2>
-            </div>
-
+            {" "}
             <Container className="mt-5 mb-4">
                 <div className="mb-2 pb-2">
                     <h4 className="fw-bold text-dark">Main State: </h4>
@@ -489,7 +477,6 @@ function StateEditor() {
                     </div>
                 ))}
             </Container>
-
             {modalType == 1 && (
                 <Modal show={showModal} onHide={handleClose} centered>
                     <Modal.Header closeButton>
@@ -573,7 +560,6 @@ function StateEditor() {
                     </Modal.Footer>
                 </Modal>
             )}
-
             {modalType == 2 && (
                 <Modal show={showModal} onHide={handleClose} centered>
                     <Modal.Header closeButton>
@@ -689,7 +675,6 @@ function StateEditor() {
                     </Modal.Footer>
                 </Modal>
             )}
-
             {modalType == 4 && (
                 <Modal show={showModal} onHide={handleClose} centered>
                     <Modal.Header closeButton>
@@ -757,7 +742,6 @@ function StateEditor() {
                     </Modal.Footer>
                 </Modal>
             )}
-
             {modalType == 5 && (
                 <Modal show={showModal} onHide={handleClose} centered>
                     <Modal.Header closeButton>
