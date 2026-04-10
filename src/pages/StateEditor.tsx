@@ -1,4 +1,4 @@
-import NavBar from "../components/NavBar";
+
 import type { DataClass } from "../Interface/Project";
 import { Button, Card, Container, Form, Modal, Stack } from "react-bootstrap";
 import { Row, Col } from "react-bootstrap";
