@@ -10,26 +10,10 @@ import {
     Stack,
 } from "react-bootstrap";
 import type { Project, ProjectsProps } from "../Interface/Project";
+import { saveProjects, loadProjects } from "../utils/storage";
+import NavBar from "../components/NavBar";
+import { DeleteButton } from "../components/DeleteButton";
 
-export const DeleteButton = ({
-    id,
-    ondelete,
-}: {
-    id: number;
-    ondelete: (n: number) => void;
-}) => {
-    return (
-        <div>
-            <Button
-                onClick={() => ondelete(id)}
-                variant="outline-danger"
-                size="sm"
-            >
-                Delete
-            </Button>
-        </div>
-    );
-};
 export const CreateProjectForm = ({
     onAdd,
 }: {
@@ -77,12 +61,15 @@ export const Dashboard = ({ projects, setProjects }: ProjectsProps) => {
         void navigate(`/project/${id}`);
     };
 
-    const handleLoadDemo = () => {
-        console.log("Load Demo clicked");
+    const handleSave = () => {
+        saveProjects(projects);
     };
 
-    const handleImport = () => {
-        console.log("Import JSON clicked");
+    const handleLoad = () => {
+        const saved = loadProjects();
+        if (saved) {
+            setProjects(saved);
+        }
     };
 
     const creatProject = (name: string) => {
@@ -90,80 +77,182 @@ export const Dashboard = ({ projects, setProjects }: ProjectsProps) => {
             id: Date.now(),
             name: name,
             lastModified: new Date().toISOString().split("T")[0],
+            pages: [],
+            routes: [],
+            stateModel: {
+                stateName: "test",
+                attributes: [],
+                customClasses: [],
+            },
+            description: "",
         };
         setProjects([...projects, newProject]);
     };
 
     return (
         <Container fluid className="p-0">
-            <div
-                className="position-relative d-flex align-items-center bg-light border-bottom"
-                style={{ height: "60px" }}
-            >
-                <h1 className="h4 m-0 fw-bold position-absolute start-50 translate-middle-x">
-                    Drafter Drafter
+            <NavBar />
+
+            <Container style={{ maxWidth: "900px" }} className="mt-4">
+                <h1
+                    style={{
+                        fontSize: "20px",
+                        borderBottom: "1px solid #ccc",
+                        paddingBottom: "8px",
+                        fontFamily: "monospace",
+                    }}
+                >
+                    My Projects
                 </h1>
 
-                <div className="ms-auto px-3">
-                    <Stack direction="horizontal" gap={2}>
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={handleLoadDemo}
-                        >
-                            Load
-                        </Button>
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={handleImport}
-                        >
-                            Import
-                        </Button>
-                    </Stack>
+                {/* Toolbar */}
+                <div
+                    className="d-flex gap-2 mb-4 p-3"
+                    style={{ border: "1px dashed #aaa", background: "#fafafa" }}
+                >
+                    <CreateProjectForm onAdd={creatProject} />
                 </div>
-            </div>
 
-            <div className="text-center mt-5">
-                <h4 className="h4 fw-bold">My Project</h4>
-            </div>
-            <CreateProjectForm onAdd={creatProject}></CreateProjectForm>
-            <hr className="my-5 border-secondary border-top opacity-25" />
-            <Row className="g-4 px-3 ">
-                {projects.map((project) => (
-                    <Col key={project.id} xs={12} md={4}>
-                        <Card>
-                            <Card.Body className="d-flex flex-column">
-                                <Card.Title className="text-muted small">
-                                    # {project.id}
-                                </Card.Title>
-                                <Card.Text className="fw-bold fs-5">
-                                    {project.name}
-                                </Card.Text>
-                                <div
-                                    className="text-muted"
-                                    style={{ fontSize: "0.75rem" }}
-                                >
-                                    Last modified: {project.lastModified}
-                                </div>
-                                <div className="d-flex ms-auto gap-1">
-                                    <Button
-                                        variant="outline-primary"
-                                        size="sm"
-                                        onClick={() => openProject(project.id)}
-                                    >
-                                        Open
-                                    </Button>
-                                    <DeleteButton
-                                        id={project.id}
-                                        ondelete={deleteProject}
-                                    ></DeleteButton>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
+                {/* Project List */}
+                <Row className="g-3">
+                    {projects.map((project) => (
+                        <Col key={project.id} xs={12}>
+                            <Card
+                                className="border-2"
+                                style={{ borderColor: "#333" }}
+                            >
+                                <Card.Body className="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <Card.Title
+                                            className="fw-bold"
+                                            style={{
+                                                fontSize: "16px",
+                                                fontFamily: "monospace",
+                                            }}
+                                        >
+                                            {project.name}
+                                        </Card.Title>
+                                        <div
+                                            className="text-muted"
+                                            style={{ fontSize: "12px" }}
+                                        >
+                                            Last modified:{" "}
+                                            {project.lastModified}
+                                        </div>
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <Button
+                                            variant="outline-dark"
+                                            size="sm"
+                                            onClick={() =>
+                                                openProject(project.id)
+                                            }
+                                            style={{ fontFamily: "monospace" }}
+                                        >
+                                            Open
+                                        </Button>
+                                        <DeleteButton
+                                            id={project.id}
+                                            ondelete={deleteProject}
+                                        />
+                                    </div>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+
+                {/* Demo Projects */}
+                <div
+                    className="mt-4 p-3"
+                    style={{ border: "2px dashed #666", background: "#fafafa" }}
+                >
+                    <h2
+                        style={{
+                            fontSize: "16px",
+                            fontFamily: "monospace",
+                            marginBottom: "10px",
+                        }}
+                    >
+                        Demo Projects
+                    </h2>
+                    <p
+                        className="text-muted"
+                        style={{ fontSize: "11px", fontStyle: "italic" }}
+                    >
+                        Load pre-built demo projects to see the tool in action
+                        (US 1.4)
+                    </p>
+                    <div className="d-flex gap-2 mt-2">
+                        <Button
+                            variant="outline-dark"
+                            size="sm"
+                            style={{ fontFamily: "monospace" }}
+                        >
+                            Load &quot;Todo List&quot; Demo
+                        </Button>
+                        <Button
+                            variant="outline-dark"
+                            size="sm"
+                            style={{ fontFamily: "monospace" }}
+                        >
+                            Load &quot;Quiz App&quot; Demo
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Save & Load */}
+                <div className="mt-4 p-3 mb-4 border">
+                    <h2
+                        style={{
+                            fontSize: "16px",
+                            fontFamily: "monospace",
+                            marginBottom: "10px",
+                        }}
+                    >
+                        Save &amp; Load
+                    </h2>
+                    <p
+                        className="text-muted"
+                        style={{ fontSize: "11px", fontStyle: "italic" }}
+                    >
+                        Projects auto-save to localStorage. Import/export as
+                        JSON for backup or sharing (US 1.3, US 8.1, US 8.2)
+                    </p>
+                    <div className="d-flex gap-2 mt-2">
+                        <Button
+                            variant="outline-dark"
+                            size="sm"
+                            onClick={handleSave}
+                            style={{ fontFamily: "monospace" }}
+                        >
+                            Save All to localStorage
+                        </Button>
+                        <Button
+                            variant="outline-dark"
+                            size="sm"
+                            onClick={handleLoad}
+                            style={{ fontFamily: "monospace" }}
+                        >
+                            Load from localStorage
+                        </Button>
+                        <Button
+                            variant="outline-dark"
+                            size="sm"
+                            style={{ fontFamily: "monospace" }}
+                        >
+                            Import Project (JSON)
+                        </Button>
+                        <Button
+                            variant="outline-dark"
+                            size="sm"
+                            style={{ fontFamily: "monospace" }}
+                        >
+                            Export Project (JSON)
+                        </Button>
+                    </div>
+                </div>
+            </Container>
             <p> Nico Fiasco</p>
             <p> Heng Luo</p>
             <p> Vibav Tandel </p>
